@@ -42,13 +42,13 @@ ansible-galaxy collection install pulp.pulp_installer
 
 # Clone installer
 git clone https://github.com/pulp/pulp_installer.git
-cd pulp_installer
+cd ${TMPDIR}/pulp_installer
 
 # Generate SECRET
-PSECRET=$(python passgen.py)
+PSECRET=$(python ${TMPDIR}/passgen.py)
 
 # Generate Admin Password
-APASS=$(python passgen.py)
+APASS=$(python ${TMPDIR}/passgen.py)
 
 # Create playbook
 cat > pulp_install.yaml << EOF
@@ -79,7 +79,9 @@ cat > pulp_install.yaml << EOF
 EOF
 
 # Disable httpd
-systemctl disable httpd --now
+if [ $(systemctl list-unit-files | grep httpd | wc -l) == "1" ];then
+  systemctl disable httpd --now
+fi
 
 # Run the playbook
 ansible-playbook pulp_install.yaml -l localhost
