@@ -1,6 +1,6 @@
 #!/bin/bash
 ##########################################
-# Script: pulp3_ansible_install_rpm-plugin.sh
+# Script: pulp3_ansible_install_centos7.sh
 #
 # Description: Script to install pulp3 on CentOS 7 system minimal
 #              using Ansible using rpm plugin.
