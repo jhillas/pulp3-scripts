@@ -22,7 +22,6 @@ import random
 chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
 print(''.join(random.choice(chars) for i in range(50)))
 EOF
-
 chmod 0700 passgen.py
 
 # Install epel-release (intentionally separate from other installs below)
@@ -47,7 +46,7 @@ cd ${TMPDIR}/pulp_installer
 # Generate SECRET
 PSECRET=$(python ${TMPDIR}/passgen.py)
 
-# Generate Admin Password
+# Generate admin password
 APASS=$(python ${TMPDIR}/passgen.py)
 
 # Create playbook
@@ -66,7 +65,7 @@ cat > pulp_install.yaml << EOF
       # pulp-container: {}
       # pulp-cookbook: {}
       # pulp-deb: {}
-      # pulp-file: {}
+      pulp-file: {}
       # pulp-gem: {}
       # pulp-maven: {}
       # pulp-npm: {}
@@ -86,6 +85,7 @@ fi
 # Run the playbook
 ansible-playbook pulp_install.yaml -l localhost
 
+# Create systemd api service
 cat > /usr/lib/systemd/system/pulpcore-api.service << EOF
 [Unit]
 Description=Pulp WSGI Server
@@ -124,7 +124,7 @@ RestartSec=3
 WantedBy=multi-user.target
 EOF
 
-#systemctl daemon-reload
+# Enable/start api service
 systemctl enable pulpcore-api.service --now
 
 # Allow ports 80/443
@@ -137,20 +137,13 @@ firewall-cmd --reload
 cp /etc/profile /etc/profile.bak
 sed -i '52 a PATH=/usr/local/lib/pulp/bin:$PATH' /etc/profile
 
+# Create account file for cli http use
 cat > /root/.netrc << EOF
 machine localhost
 login admin
 password $APASS
 EOF
 chmod 0600 /root/.netrc
-
-# HTTPie examples
-#http example.org               # => GET
-#http example.org hello=world   # => POST
-#http :/pulp/api/v3/status/     # => http://pulp/api/v3/status/
-#http example.org --auth USER[:PASS] -a USER[:PASS]
-#http example.org --auth-type {basic,digest} -A {basic,digest}
-#http http://xpa-pulp02.maverik.com/auth/login/?next=/pulp/api/v3/remotes/rpm/rpm/
 
 # Clone pulp_rpm repo, very helpful scripts here
 git clone https://github.com/pulp/pulp_rpm.git
