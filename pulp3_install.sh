@@ -46,10 +46,10 @@ git clone https://github.com/pulp/pulp_installer.git
 cd pulp_installer
 
 # Generate SECRET
-PSECRET=$(python /maverik/software/passgen.py)
+PSECRET=$(python /software/passgen.py)
 
 # Generate Admin Password
-APASS=$(python /maverik/software/passgen.py)
+APASS=$(python /software/passgen.py)
 
 # Create playbook
 cat > pulp_install.yaml << EOF
